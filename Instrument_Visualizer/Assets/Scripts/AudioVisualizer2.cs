@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-public class AudioVisualizer : MonoBehaviour
+public class AudioVisualizer2 : MonoBehaviour
 {
 	public List<Transform> audioSpectrumObjects = new List<Transform>();
 	[Min(1)] public float heightMultiplier;
@@ -102,7 +102,7 @@ public class AudioVisualizer : MonoBehaviour
 
 		if (overrideSamples == true)
 		{
-			overrideValue = overrideNumber;
+			overrideValue = convertedSamples / overrideNumber;
 			//Debug.Log("overwritten: " + overrideValue);
 		}
 		else
@@ -123,16 +123,19 @@ public class AudioVisualizer : MonoBehaviour
 		//I could solve the issue by making the i skip numbers by adding more than just 1 at a time ***********
 		//The second possible solution would be dividing the number of frequencies captured by number of objs, making htat into an array with the averages, and using it as a base
 
-		for (int j = 0; j < overrideValue; j++)
+		for (int j = 0; j < convertedSamples; j++)
 		{
-			//Debug.Log("before " + frequencyRange);
-			GetAverageFromRange(spectrum, j, overrideValue);
-			//Debug.Log("after " + frequencyRange);
+			float intensity;
 
-
-			// apply height multiplier to intensity (grabs a range of values depending on the convertedSamples divided by overrideNumber, averages them, and returns them)
-
-			float intensity = spectrum[j] * heightMultiplier;
+			//checks to see if the current number is a multiple of overrideValue, and if so, then apply the scale change, otherwise leave it 0
+			if (j % overrideValue == 0)
+            {
+				intensity = spectrum[j] * heightMultiplier;
+			}
+			else
+            {
+				intensity = 0;
+			}
 
 			//this one below doesn't work for some reason... the idea is for it to average the spectrum data by dividing it into the number of cubes that have been created
 			//that way you can manually set how many cubes you want to use instead of just hte exact amount of frequencies captured
@@ -147,25 +150,6 @@ public class AudioVisualizer : MonoBehaviour
 			// appply new scale to object
 			audioSpectrumObjects[j].localScale = newScale;
 
-		}
-	}
-
-	public void GetAverageFromRange(float[] spectrum, float j, int overrideNumber)
-	{
-		float currentFrequencyRange = convertedSamples / overrideNumber;
-
-		float rangeValue = 0f;
-
-		for (int z = 0; z < overrideNumber; z++)
-        {
-			//the starting point of this loop needs to grow for each obj in the array
-			for (int i = Mathf.FloorToInt(j * currentFrequencyRange); i < currentFrequencyRange; i++)
-			{
-				rangeValue = rangeValue + spectrum[i];
-				//Debug.Log("number of iterations = " + i);
-			}
-			correctedSpectrum[z] = ((rangeValue / currentFrequencyRange) * heightMultiplier);
-			//Debug.Log(correctedSpectrum[z]);
 		}
 	}
 }
