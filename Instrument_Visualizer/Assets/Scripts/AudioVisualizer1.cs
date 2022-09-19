@@ -149,6 +149,7 @@ public class AudioVisualizer1 : MonoBehaviour
 		}
 
 		 frequencyRange = rangeValue / currentFrequencyRange;
+		Debug.Log(frequencyRange);
 
 		//Debug.Log(frequencyRange);
 	}
