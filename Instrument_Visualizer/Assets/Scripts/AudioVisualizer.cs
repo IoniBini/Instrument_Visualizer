@@ -9,16 +9,11 @@ public class AudioVisualizer : MonoBehaviour
 	[Min(1)] public float heightMultiplier;
 	[Range(6, 13)] [Tooltip("This number is powered by 2, resulting in a multiple that fits between 64 and 8192")]
 	public int numberOfSamples = 6;
-	[Tooltip("When false, the number of cubes generated = number of samples, when false, you can choose whatever number you want in overrideNumber")]
-	public bool overrideSamples = false;
-	[Range(1, 8192)] 
-	public int overrideNumber = 1024;
+
 	private int convertedSamples;
 	public float visualizerSpan = 21f;
-	public FFTWindow fftWindow;
 	[Range(0.01f, 0.5f)]public float lerpTime = 0.01f;
 	public GameObject visualizerObj;
-	[SerializeField] private List<float> correctedSpectrum;
 
 	/*
 	 * The intensity of the frequencies found between 0 and 44100 will be
@@ -40,22 +35,9 @@ public class AudioVisualizer : MonoBehaviour
 
 		ClearVisualizer();
 
-		float overrideValue;
+		float samplesScales = visualizerSpan / convertedSamples;
 
-		if (overrideSamples == true)
-		{
-			overrideValue = overrideNumber;
-			//Debug.Log("overwritten: " + overrideValue);
-		}
-		else
-        {
-			overrideValue = convertedSamples;
-			//Debug.Log("NOT overwritten: " + overrideValue);
-		}
-
-		float samplesScales = visualizerSpan / overrideValue;
-
-		for (int i = 0; i < overrideValue; i++)
+		for (int i = 0; i < convertedSamples; i++)
 		//for (int i = 0; i < 170; i++)
 		{
 			//Debug.Log("ACTUAL override: " + overrideValue);
@@ -63,12 +45,8 @@ public class AudioVisualizer : MonoBehaviour
 			var instantiatedObj = Instantiate(visualizerObj, new Vector3((samplesScales * i) - (visualizerSpan/2) + transform.position.x, transform.position.y, transform.position.z), new Quaternion(0,0,0,0));
 			instantiatedObj.transform.localScale = new Vector3(samplesScales, 1, 1);
 			instantiatedObj.transform.parent = transform;
+			instantiatedObj.name = "Frequency " + i;
 			audioSpectrumObjects.Add(instantiatedObj.transform);
-		}
-
-		for (int j = 0; j < overrideValue; j++)
-		{
-			correctedSpectrum.Add(0);
 		}
 	}
 
@@ -93,45 +71,18 @@ public class AudioVisualizer : MonoBehaviour
 		}
 
 		audioSpectrumObjects.Clear();
-		correctedSpectrum.Clear();
 	}
 
     void Update()
 	{
-		int overrideValue;
-
-		if (overrideSamples == true)
-		{
-			overrideValue = overrideNumber;
-			//Debug.Log("overwritten: " + overrideValue);
-		}
-		else
-		{
-			overrideValue = convertedSamples;
-			//Debug.Log("NOT overwritten: " + overrideValue);
-		}
-
 		// initialize our float array
 		float[] spectrum = new float[convertedSamples];
 
 		// populate array with fequency spectrum data
-		GetComponent<AudioSource>().GetSpectrumData(spectrum, 0, fftWindow);
+		GetComponent<AudioSource>().GetSpectrumData(spectrum, 0, FFTWindow.Blackman);
 
-		// loop over audioSpectrumObjects and modify according to fequency spectrum data
-		// this loop matches the Array element to an object on a One-to-One basis.
-
-		//I could solve the issue by making the i skip numbers by adding more than just 1 at a time ***********
-		//The second possible solution would be dividing the number of frequencies captured by number of objs, making htat into an array with the averages, and using it as a base
-
-		for (int j = 0; j < overrideValue; j++)
+		for (int j = 0; j < convertedSamples; j++)
 		{
-			//Debug.Log("before " + frequencyRange);
-			GetAverageFromRange(spectrum, j, overrideValue);
-			//Debug.Log("after " + frequencyRange);
-
-
-			// apply height multiplier to intensity (grabs a range of values depending on the convertedSamples divided by overrideNumber, averages them, and returns them)
-
 			float intensity = spectrum[j] * heightMultiplier;
 
 			//this one below doesn't work for some reason... the idea is for it to average the spectrum data by dividing it into the number of cubes that have been created
@@ -147,25 +98,6 @@ public class AudioVisualizer : MonoBehaviour
 			// appply new scale to object
 			audioSpectrumObjects[j].localScale = newScale;
 
-		}
-	}
-
-	public void GetAverageFromRange(float[] spectrum, float j, int overrideNumber)
-	{
-		float currentFrequencyRange = convertedSamples / overrideNumber;
-
-		float rangeValue = 0f;
-
-		for (int z = 0; z < overrideNumber; z++)
-        {
-			//the starting point of this loop needs to grow for each obj in the array
-			for (int i = Mathf.FloorToInt(j * currentFrequencyRange); i < currentFrequencyRange; i++)
-			{
-				rangeValue = rangeValue + spectrum[i];
-				//Debug.Log("number of iterations = " + i);
-			}
-			correctedSpectrum[z] = ((rangeValue / currentFrequencyRange) * heightMultiplier);
-			//Debug.Log(correctedSpectrum[z]);
 		}
 	}
 }

@@ -16,7 +16,7 @@ public class AudioVisualizer5 : MonoBehaviour
     [System.Serializable]
     public struct BandParameters
     {
-        public Vector2 bandRange;
+        public List<Vector2> bandRange;
         [Min(0.1f)] public float heightMultiplier;
         [Range(0.01f, 0.5f)] public float lerpTime;
         public Gradient colorOverFrequency;
@@ -81,19 +81,26 @@ public class AudioVisualizer5 : MonoBehaviour
         float currentValue = 0;
         int numberOfFrequencies = 0;
 
-        //Debug.Log(transform.childCount);
-
+        //the first for loop is to apply it for each child
         for (int j = 0; transform.childCount > j; j++)
         {
+
+            //the second for loop is to go over each frequency in the spectrum to collect only what is relevant
             for (int i = 0; spectrum.Length > i; i++)
             {
-                if (i >= bandParameters[j].bandRange.x && i < bandParameters[j].bandRange.y)
-                {
-                    //Debug.Log(i + " > " + bandParameters[j].bandRange.x + " & " + i + " < " + bandParameters[j].bandRange.y);
 
-                    currentValue += spectrum[i];
-                    numberOfFrequencies++;
+                //the third for loop goes through every range within the array of ranges 
+                for (int w = 0; bandParameters[j].bandRange.Count > w; w++)
+                {
+                    if (i >= bandParameters[j].bandRange[w].x && i < bandParameters[j].bandRange[w].y)
+                    {
+                        //Debug.Log(i + " >= " + bandParameters[j].bandRange[w].x + " & " + i + " < " + bandParameters[j].bandRange[w].y);
+
+                        currentValue += spectrum[i];
+                        numberOfFrequencies++;
+                    }
                 }
+                
             }
 
             float average = (currentValue / numberOfFrequencies) * bandParameters[j].heightMultiplier;

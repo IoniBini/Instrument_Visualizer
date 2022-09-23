@@ -430,7 +430,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1250834438
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -448,7 +448,8 @@ MonoBehaviour:
   visualizerObj: {fileID: 7442849600094169958, guid: 97ed126983193854cb0c3d9898c1e647, type: 3}
   spectrum: []
   bandParameters:
-  - bandRange: {x: 40, y: 50}
+  - bandRange:
+    - {x: 2, y: 15}
     heightMultiplier: 133.3
     lerpTime: 0.01
     colorOverFrequency:
@@ -480,25 +481,25 @@ MonoBehaviour:
       m_Mode: 0
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
-    colorFrequencyMultiplier: 447.2
-    emissionMultiplier: 500
+    colorFrequencyMultiplier: 300
+    emissionMultiplier: 100
     emissionIntensityCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
         time: 0
         value: -1
-        inSlope: 151
-        outSlope: 151
+        inSlope: 23.964104
+        outSlope: 23.964104
         tangentMode: 34
         weightedMode: 0
         inWeight: 0
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 150
-        inSlope: 151
-        outSlope: 151
+        value: 22.964104
+        inSlope: 23.964104
+        outSlope: 23.964104
         tangentMode: 34
         weightedMode: 0
         inWeight: 0.33333334
@@ -506,7 +507,8 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  - bandRange: {x: 2, y: 15}
+  - bandRange:
+    - {x: 110, y: 114}
     heightMultiplier: 50
     lerpTime: 0.01
     colorOverFrequency:
@@ -539,7 +541,7 @@ MonoBehaviour:
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
     colorFrequencyMultiplier: 300
-    emissionMultiplier: 500
+    emissionMultiplier: 100
     emissionIntensityCurve:
       serializedVersion: 2
       m_Curve:
@@ -730,7 +732,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1370513946
 MonoBehaviour:
   m_ObjectHideFlags: 0
