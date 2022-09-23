@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class AudioVisualizer5 : MonoBehaviour
 {
+    public bool generateObjsOnSpawn = true;
     public float visualizerSpan = 10;
     public GameObject visualizerObj;
 
@@ -21,11 +22,12 @@ public class AudioVisualizer5 : MonoBehaviour
         public Gradient colorOverFrequency;
         [Min(1)] public float colorFrequencyMultiplier;
         [Min(1)] public float emissionMultiplier;
-        [Min(1)] public AnimationCurve emissionIntensityCurve;
+        public AnimationCurve emissionIntensityCurve;
     }
 
     private void Start()
     {
+        if (generateObjsOnSpawn == true)
         GenerateVisualizerObjs();
     }
 
@@ -85,8 +87,10 @@ public class AudioVisualizer5 : MonoBehaviour
         {
             for (int i = 0; spectrum.Length > i; i++)
             {
-                if (i > bandParameters[j].bandRange.x && i < bandParameters[j].bandRange.y)
+                if (i >= bandParameters[j].bandRange.x && i < bandParameters[j].bandRange.y)
                 {
+                    //Debug.Log(i + " > " + bandParameters[j].bandRange.x + " & " + i + " < " + bandParameters[j].bandRange.y);
+
                     currentValue += spectrum[i];
                     numberOfFrequencies++;
                 }
