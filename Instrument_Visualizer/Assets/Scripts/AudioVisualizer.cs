@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 public class AudioVisualizer : MonoBehaviour
 {
+	public AudioSource targetAudio;
 	public List<Transform> audioSpectrumObjects = new List<Transform>();
 	[Min(1)] public float heightMultiplier;
 	[Range(6, 13)] [Tooltip("This number is powered by 2, resulting in a multiple that fits between 64 and 8192")]
@@ -24,6 +25,16 @@ public class AudioVisualizer : MonoBehaviour
 
 	private void Start()
     {
+		if (targetAudio == null)
+        {
+			targetAudio = GetComponent<AudioSource>();
+			GetComponent<VoiceDetection>().enabled = true;
+		}
+		else
+        {
+			GetComponent<VoiceDetection>().enabled = false;
+		}
+
 		audioSpectrumObjects.Clear();
 		GenerateVisualizerObjs();
     }
@@ -79,7 +90,7 @@ public class AudioVisualizer : MonoBehaviour
 		float[] spectrum = new float[convertedSamples];
 
 		// populate array with fequency spectrum data
-		GetComponent<AudioSource>().GetSpectrumData(spectrum, 0, FFTWindow.Blackman);
+		targetAudio.GetSpectrumData(spectrum, 0, FFTWindow.Blackman);
 
 		for (int j = 0; j < convertedSamples; j++)
 		{

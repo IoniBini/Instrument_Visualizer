@@ -16,7 +16,7 @@ public class AudioVisualizer5 : MonoBehaviour
     [System.Serializable]
     public struct BandParameters
     {
-        public List<Vector2> bandRange;
+        [ExecuteInEditMode] public List<Vector2> bandRange;
         [Min(0.1f)] public float heightMultiplier;
         [Range(0.01f, 0.5f)] public float lerpTime;
         public Gradient colorOverFrequency;
@@ -92,12 +92,12 @@ public class AudioVisualizer5 : MonoBehaviour
                 //the third for loop goes through every range within the array of ranges 
                 for (int w = 0; bandParameters[j].bandRange.Count > w; w++)
                 {
+                    //checks to see if the current frequency falls within the range proposed by the previous for loop
                     if (i >= bandParameters[j].bandRange[w].x && i < bandParameters[j].bandRange[w].y)
-                    {
-                        //Debug.Log(i + " >= " + bandParameters[j].bandRange[w].x + " & " + i + " < " + bandParameters[j].bandRange[w].y);
-
+                    {                        
                         currentValue += spectrum[i];
                         numberOfFrequencies++;
+                        
                     }
                 }
                 
@@ -105,6 +105,9 @@ public class AudioVisualizer5 : MonoBehaviour
 
             float average = (currentValue / numberOfFrequencies) * bandParameters[j].heightMultiplier;
             float lerpY = Mathf.Lerp(transform.GetChild(j).localScale.y, average, bandParameters[j].lerpTime);
+
+            //if (lerpY <= 0.001f) lerpY = 0.001f;
+
             transform.GetChild(j).localScale = new Vector3(transform.GetChild(j).localScale.x, lerpY, transform.localScale.z);
 
             var target = transform.GetChild(j).GetComponent<Renderer>();
