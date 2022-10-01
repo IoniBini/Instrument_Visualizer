@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class AudioVisualizer5 : MonoBehaviour
 {
+    [HideInInspector] public List<Color> currentColor;
+    [HideInInspector] public Color colorAverage;
+
     public bool generateObjsOnSpawn = true;
     public float visualizerSpan = 10;
     public GameObject visualizerObj;
@@ -17,6 +20,8 @@ public class AudioVisualizer5 : MonoBehaviour
     public struct BandParameters
     {
         [ExecuteInEditMode] public List<Vector2> bandRange;
+        public float frequencyGate;
+        public float frequencyGateIntensity;
         [Min(0.1f)] public float heightMultiplier;
         [Range(0.01f, 0.5f)] public float lerpTime;
         public Gradient colorOverFrequency;
@@ -45,12 +50,15 @@ public class AudioVisualizer5 : MonoBehaviour
             instantiatedObj.transform.localScale = new Vector3(samplesScales, 1, 1);
             instantiatedObj.transform.parent = transform;
             instantiatedObj.name = "Band " + i;
+            currentColor.Add(Color.black);
         }
     }
 
     [ContextMenu("Clear Visualizer Objs")]
     public void ClearVisualizer()
     {
+        currentColor.Clear();
+
         GameObject currentObj;
         int childs = transform.childCount;
 
@@ -94,10 +102,21 @@ public class AudioVisualizer5 : MonoBehaviour
                 {
                     //checks to see if the current frequency falls within the range proposed by the previous for loop
                     if (i >= bandParameters[j].bandRange[w].x && i < bandParameters[j].bandRange[w].y)
-                    {                        
-                        currentValue += spectrum[i];
-                        numberOfFrequencies++;
-                        
+                    {          
+                        //the gate is responsible for filtering frequencies that constantly get picked up but that are not loud enough to be audible. This happens more often with
+                        //microphone capture than instruments, because you can't efficiently stop capturing all the frequencies of a microphone like you could an instrument by simply
+                        //stop playing
+
+                        if(bandParameters[j].frequencyGate > spectrum[i])
+                        {
+                            currentValue += spectrum[i] / bandParameters[j].frequencyGateIntensity;
+                            numberOfFrequencies++;
+                        }
+                        else
+                        {
+                            currentValue += spectrum[i];
+                            numberOfFrequencies++;
+                        }
                     }
                 }
                 
@@ -105,8 +124,6 @@ public class AudioVisualizer5 : MonoBehaviour
 
             float average = (currentValue / numberOfFrequencies) * bandParameters[j].heightMultiplier;
             float lerpY = Mathf.Lerp(transform.GetChild(j).localScale.y, average, bandParameters[j].lerpTime);
-
-            //if (lerpY <= 0.001f) lerpY = 0.001f;
 
             transform.GetChild(j).localScale = new Vector3(transform.GetChild(j).localScale.x, lerpY, transform.localScale.z);
 
@@ -117,8 +134,20 @@ public class AudioVisualizer5 : MonoBehaviour
             float emissionLerp = Mathf.InverseLerp(0, spectrum.Length, lerpY * bandParameters[j].emissionMultiplier);
 
             propertyBlock.SetColor("_Color", bandParameters[j].colorOverFrequency.Evaluate(colorLerp) * bandParameters[j].emissionIntensityCurve.Evaluate(emissionLerp));
+            currentColor[j] = bandParameters[j].colorOverFrequency.Evaluate(colorLerp) * bandParameters[j].emissionIntensityCurve.Evaluate(emissionLerp);
+            
 
             target.SetPropertyBlock(propertyBlock);
         }
+
+        int currentColorCount = 0;
+
+        for (int z = 0; currentColor.Count > z; z++)
+        {
+            colorAverage += currentColor[z];
+            currentColorCount++;
+        }
+
+        colorAverage /= currentColorCount;
     }
 }
