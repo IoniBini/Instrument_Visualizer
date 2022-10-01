@@ -7,6 +7,12 @@ public class AudioVisualizer5 : MonoBehaviour
     [HideInInspector] public List<Color> currentColor;
     [HideInInspector] public Color colorAverage;
 
+    [HideInInspector] public float shaderFrequencyLerp;
+    [HideInInspector] public float shaderSpeedLerp;
+
+    public float shaderFrequencyMultiplier = 10;
+    public float shaderSpeedMultiplier = 2;
+
     public bool generateObjsOnSpawn = true;
     public float visualizerSpan = 10;
     public GameObject visualizerObj;
@@ -88,6 +94,7 @@ public class AudioVisualizer5 : MonoBehaviour
 
         float currentValue = 0;
         int numberOfFrequencies = 0;
+        int currentColorCount = 0;
 
         //the first for loop is to apply it for each child
         for (int j = 0; transform.childCount > j; j++)
@@ -103,7 +110,7 @@ public class AudioVisualizer5 : MonoBehaviour
                     //checks to see if the current frequency falls within the range proposed by the previous for loop
                     if (i >= bandParameters[j].bandRange[w].x && i < bandParameters[j].bandRange[w].y)
                     {          
-                        //the gate is responsible for filtering frequencies that constantly get picked up but that are not loud enough to be audible. This happens more often with
+                        //the gate is responsible for filtering dead frequencies that constantly get picked up but that are not loud enough to be audible. This happens more often with
                         //microphone capture than instruments, because you can't efficiently stop capturing all the frequencies of a microphone like you could an instrument by simply
                         //stop playing
 
@@ -123,6 +130,10 @@ public class AudioVisualizer5 : MonoBehaviour
             }
 
             float average = (currentValue / numberOfFrequencies) * bandParameters[j].heightMultiplier;
+
+            shaderFrequencyLerp = Mathf.Lerp(GetComponentInParent<InstrumentColorAverage>().skyShader.GetFloat("_Frequency"),average * shaderFrequencyMultiplier, bandParameters[j].lerpTime);
+            shaderSpeedLerp = Mathf.Lerp(GetComponentInParent<InstrumentColorAverage>().skyShader.GetFloat("_Speed"), average * shaderSpeedMultiplier, bandParameters[j].lerpTime);
+
             float lerpY = Mathf.Lerp(transform.GetChild(j).localScale.y, average, bandParameters[j].lerpTime);
 
             transform.GetChild(j).localScale = new Vector3(transform.GetChild(j).localScale.x, lerpY, transform.localScale.z);
@@ -136,15 +147,9 @@ public class AudioVisualizer5 : MonoBehaviour
             propertyBlock.SetColor("_Color", bandParameters[j].colorOverFrequency.Evaluate(colorLerp) * bandParameters[j].emissionIntensityCurve.Evaluate(emissionLerp));
             currentColor[j] = bandParameters[j].colorOverFrequency.Evaluate(colorLerp) * bandParameters[j].emissionIntensityCurve.Evaluate(emissionLerp);
             
-
             target.SetPropertyBlock(propertyBlock);
-        }
 
-        int currentColorCount = 0;
-
-        for (int z = 0; currentColor.Count > z; z++)
-        {
-            colorAverage += currentColor[z];
+            colorAverage += currentColor[j];
             currentColorCount++;
         }
 

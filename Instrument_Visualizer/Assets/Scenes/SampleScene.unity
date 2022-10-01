@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.012715049, g: 0.031159282, b: 0.016765067, a: 1}
+  m_IndirectSpecularColor: {r: 0.16245285, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -457,8 +457,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9caf7a7f3fdca649b22d770b4f272bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  instrumentColors: []
+  instruments: []
   skyShader: {fileID: 2100000, guid: cfe66b7898b29124196fa2d98cbb0fa4, type: 2}
+  sumOfShaderLerps: 0
   sumOfInstrumentColors: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &1250834437
 GameObject:
@@ -494,6 +495,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentColor: []
   colorAverage: {r: 0, g: 0, b: 0, a: 0}
+  shaderLerp: 0
   generateObjsOnSpawn: 1
   visualizerSpan: 10
   visualizerObj: {fileID: 7442849600094169958, guid: 97ed126983193854cb0c3d9898c1e647, type: 3}
@@ -2126,6 +2128,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentColor: []
   colorAverage: {r: 0, g: 0, b: 0, a: 0}
+  shaderLerp: 0
   generateObjsOnSpawn: 1
   visualizerSpan: 10
   visualizerObj: {fileID: 7442849600094169958, guid: 97ed126983193854cb0c3d9898c1e647, type: 3}

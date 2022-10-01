@@ -5,10 +5,8 @@
         _ColorAverage("Color Average", Color) = (1, 0, 0, 0)
         _OverallDim("Overall Shader Dim", float) = 10
         _Dir("Direction", Vector) = (0.0, 1.0, 0.0)
-        _FrequencyA ("Frequency A", Float) = 5
-        _SpeedA ("Speed A", Float) = 1
-        _FrequencyB ("Frequency B", Float) = 5
-        _SpeedB ("Speed B", Float) = 1
+        _Frequency ("Frequency", Float) = 5
+        _Speed ("Speed", Float) = 1
     }
     SubShader
     {
@@ -38,10 +36,8 @@
             Vector _Dir;
             float _OverallDim;
             float4 _ColorAverage;
-            float _FrequencyA;
-            float _FrequencyB;
-            float _SpeedA;
-            float _SpeedB;
+            float _Frequency;
+            float _Speed;
 
             v2f vert (appdata v)
             {
@@ -53,13 +49,11 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
-                float tA = length(i.uv - float2(_Dir.x, _Dir.y)) * _FrequencyA + _Time.y * _SpeedA;
+
+                float tA = length(i.uv - float2(_Dir.x, _Dir.y)) * _Frequency + _Time.y * _Speed;
                 float valA = sin(tA) * 0.5 + 0.5;
                 
-                float tB = length(i.uv - float2(_Dir.z, _Dir.w)) * _FrequencyB + _Time.y * _SpeedB;
-                float valB = sin(tB) * 0.5 + 0.5;
-                
-                return float4((valA + valB) * float3(1, 1, 1), 1) * _ColorAverage / _OverallDim;
+                return float4(valA * float3(1, 1, 1), 1) * _ColorAverage / _OverallDim;
             }
             ENDCG
         }
