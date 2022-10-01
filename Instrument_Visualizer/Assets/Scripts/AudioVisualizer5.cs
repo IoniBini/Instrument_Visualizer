@@ -10,7 +10,9 @@ public class AudioVisualizer5 : MonoBehaviour
     [HideInInspector] public float shaderFrequencyLerp;
     [HideInInspector] public float shaderSpeedLerp;
 
-    public float shaderFrequencyMultiplier = 10;
+    public float maxShaderPositionLerp = 10;
+
+    public AnimationCurve shaderFrequencyMultiplier;
     public float shaderSpeedMultiplier = 2;
 
     public bool generateObjsOnSpawn = true;
@@ -92,6 +94,7 @@ public class AudioVisualizer5 : MonoBehaviour
         // populate array with fequency spectrum data
         GetComponent<AudioSource>().GetSpectrumData(spectrum, 0, FFTWindow.Blackman);
 
+        float instrumentIntensity = 0;
         float currentValue = 0;
         int numberOfFrequencies = 0;
         int currentColorCount = 0;
@@ -130,8 +133,9 @@ public class AudioVisualizer5 : MonoBehaviour
             }
 
             float average = (currentValue / numberOfFrequencies) * bandParameters[j].heightMultiplier;
+            instrumentIntensity += average;
 
-            shaderFrequencyLerp = Mathf.Lerp(GetComponentInParent<InstrumentColorAverage>().skyShader.GetFloat("_Frequency"),average * shaderFrequencyMultiplier, bandParameters[j].lerpTime);
+            shaderFrequencyLerp = Mathf.Lerp(GetComponentInParent<InstrumentColorAverage>().skyShader.GetFloat("_Frequency"), shaderFrequencyMultiplier.Evaluate(average), bandParameters[j].lerpTime);
             shaderSpeedLerp = Mathf.Lerp(GetComponentInParent<InstrumentColorAverage>().skyShader.GetFloat("_Speed"), average * shaderSpeedMultiplier, bandParameters[j].lerpTime);
 
             float lerpY = Mathf.Lerp(transform.GetChild(j).localScale.y, average, bandParameters[j].lerpTime);
@@ -154,5 +158,9 @@ public class AudioVisualizer5 : MonoBehaviour
         }
 
         colorAverage /= currentColorCount;
+
+        float instrumentIntensityAveraged = instrumentIntensity / currentColorCount;
+
+        GetComponentInParent<InstrumentColorAverage>().bandIntensity[transform.GetSiblingIndex()] = Mathf.InverseLerp(GetComponentInParent<InstrumentColorAverage>().bandIntensity[transform.GetSiblingIndex()], maxShaderPositionLerp, instrumentIntensityAveraged);
     }
 }

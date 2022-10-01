@@ -49,7 +49,6 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
-
                 float tA = length(i.uv - float2(_Dir.x, _Dir.y)) * _Frequency + _Time.y * _Speed;
                 float valA = sin(tA) * 0.5 + 0.5;
                 

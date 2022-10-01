@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-public class AudioVisualizer : MonoBehaviour
+public class AudioVisualizerDebug : MonoBehaviour
 {
 	public AudioSource targetAudio;
 	public List<Transform> audioSpectrumObjects = new List<Transform>();
