@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Rendering.PostProcessing;
 
 public class InstrumentColorAverage : MonoBehaviour
 {
@@ -10,6 +12,14 @@ public class InstrumentColorAverage : MonoBehaviour
     [HideInInspector] public List<float> bandIntensity;
     public List<Vector2> targetPositions;
     public float movementSpeed = 0.005f;
+
+    public List<UnityEvent> ParentEvents;
+    [Range(0,1)] public float eventFreqTriggerParent = 0.3f;
+    private bool canTriggerEventsParent = true;
+    public bool randomlyPickOneEventParent = false;
+
+    public ChromaticAberration chrAb;
+    private bool chrAbIsRunning = false;
 
     private float sumOfFreqLerps;
     private float sumOfSpeedLerps;
@@ -64,5 +74,91 @@ public class InstrumentColorAverage : MonoBehaviour
         skyShader.SetColor("_ColorAverage", sumOfInstrumentColors);
         skyShader.SetFloat("_Frequency", sumOfFreqLerps);
         skyShader.SetFloat("_Speed", sumOfSpeedLerps);
+
+        //this loop HAS to be self contained, cant be together with the other one looping through the children because if it gets to the "break" function,
+        //it confilcts with the things that are running with the other methods
+
+        for (int j = 0; j < bandIntensity.Count; j++)
+        {
+            if (bandIntensity[j] >= eventFreqTriggerParent && j != bandIntensity.Count - 1)
+            {
+                continue;
+            }
+            else if (bandIntensity[j] >= eventFreqTriggerParent && j == bandIntensity.Count - 1)
+            {
+                if (canTriggerEventsParent == true)
+                {
+                    TriggerInstrumentEventParent();
+                }
+            }
+            else if (bandIntensity[j] <= eventFreqTriggerParent - 0.1f && j == bandIntensity.Count - 1)
+            {
+                canTriggerEventsParent = true;
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    private void TriggerInstrumentEventParent()
+    {
+        canTriggerEventsParent = false;
+
+        if (randomlyPickOneEventParent == false)
+        {
+            for (int i = 0; ParentEvents.Count > i; i++)
+            {
+                ParentEvents[i].Invoke();
+            }
+        }
+        else
+        {
+            ParentEvents[Random.Range(0, ParentEvents.Count)].Invoke();
+        }
+    }
+
+    public void ChromaticAberrationEvent()
+    {
+        if (chrAbIsRunning == false) StartCoroutine(ChromaticAberrationRise());
+    }
+
+    IEnumerator ChromaticAberrationRise()
+    {
+        chrAbIsRunning = true;
+
+        GetComponent<PostProcessVolume>().profile.TryGetSettings(out chrAb);
+
+        chrAb.intensity.value = Mathf.Lerp(chrAb.intensity.value, 1, 0.1f);
+
+        yield return new WaitForSeconds(0.1f);
+
+        if (chrAb.intensity.value <= 0.9f)
+        {
+            StartCoroutine(ChromaticAberrationRise());
+        }
+        else
+        {
+            StartCoroutine(ChromaticAberrationFall());
+        }
+    }
+
+    IEnumerator ChromaticAberrationFall()
+    {
+        GetComponent<PostProcessVolume>().profile.TryGetSettings(out chrAb);
+
+        chrAb.intensity.value = Mathf.Lerp(chrAb.intensity.value, 0, 0.1f);
+
+        yield return new WaitForSeconds(0.1f);
+
+        if (chrAb.intensity.value >= 0.05f)
+        {
+            StartCoroutine(ChromaticAberrationFall());
+        }
+        else
+        {
+            chrAbIsRunning = false;
+        }
     }
 }

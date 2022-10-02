@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class AudioVisualizer5 : MonoBehaviour
 {
@@ -10,17 +11,24 @@ public class AudioVisualizer5 : MonoBehaviour
     [HideInInspector] public float shaderFrequencyLerp;
     [HideInInspector] public float shaderSpeedLerp;
 
+    public AudioSource overrideAudioSource;
+    private AudioSource actualAudioSource;
+
     public float maxShaderPositionLerp = 10;
 
     public AnimationCurve shaderFrequencyMultiplier;
     public float shaderSpeedMultiplier = 2;
+
+    public List<UnityEvent> InstrumentEvents;
+    [Min(1)] public float eventFreqTrigger = 1;
+    private bool canTriggerEvents = true;
+    public bool randomlyPickOneEvent = false;
 
     public bool generateObjsOnSpawn = true;
     public float visualizerSpan = 10;
     public GameObject visualizerObj;
 
     public float[] spectrum;
-    //[Range(0.01f, 0.5f)] public float lerpTime = 0.01f;
 
     public BandParameters[] bandParameters;
 
@@ -36,6 +44,19 @@ public class AudioVisualizer5 : MonoBehaviour
         [Min(1)] public float colorFrequencyMultiplier;
         [Min(1)] public float emissionMultiplier;
         public AnimationCurve emissionIntensityCurve;
+    }
+
+    private void Awake()
+    {
+        if (overrideAudioSource == null)
+        {
+            actualAudioSource = GetComponent<AudioSource>();
+        }
+        else
+        {
+            GetComponent<VoiceDetection>().enabled = false;
+            actualAudioSource = overrideAudioSource;
+        }
     }
 
     private void Start()
@@ -92,7 +113,7 @@ public class AudioVisualizer5 : MonoBehaviour
         spectrum = new float[1024];
 
         // populate array with fequency spectrum data
-        GetComponent<AudioSource>().GetSpectrumData(spectrum, 0, FFTWindow.Blackman);
+        actualAudioSource.GetSpectrumData(spectrum, 0, FFTWindow.Blackman);
 
         float instrumentIntensity = 0;
         float currentValue = 0;
@@ -112,12 +133,12 @@ public class AudioVisualizer5 : MonoBehaviour
                 {
                     //checks to see if the current frequency falls within the range proposed by the previous for loop
                     if (i >= bandParameters[j].bandRange[w].x && i < bandParameters[j].bandRange[w].y)
-                    {          
+                    {
                         //the gate is responsible for filtering dead frequencies that constantly get picked up but that are not loud enough to be audible. This happens more often with
                         //microphone capture than instruments, because you can't efficiently stop capturing all the frequencies of a microphone like you could an instrument by simply
                         //stop playing
 
-                        if(bandParameters[j].frequencyGate > spectrum[i])
+                        if (bandParameters[j].frequencyGate > spectrum[i])
                         {
                             currentValue += spectrum[i] / bandParameters[j].frequencyGateIntensity;
                             numberOfFrequencies++;
@@ -129,7 +150,7 @@ public class AudioVisualizer5 : MonoBehaviour
                         }
                     }
                 }
-                
+
             }
 
             float average = (currentValue / numberOfFrequencies) * bandParameters[j].heightMultiplier;
@@ -150,7 +171,7 @@ public class AudioVisualizer5 : MonoBehaviour
 
             propertyBlock.SetColor("_Color", bandParameters[j].colorOverFrequency.Evaluate(colorLerp) * bandParameters[j].emissionIntensityCurve.Evaluate(emissionLerp));
             currentColor[j] = bandParameters[j].colorOverFrequency.Evaluate(colorLerp) * bandParameters[j].emissionIntensityCurve.Evaluate(emissionLerp);
-            
+
             target.SetPropertyBlock(propertyBlock);
 
             colorAverage += currentColor[j];
@@ -162,5 +183,34 @@ public class AudioVisualizer5 : MonoBehaviour
         float instrumentIntensityAveraged = instrumentIntensity / currentColorCount;
 
         GetComponentInParent<InstrumentColorAverage>().bandIntensity[transform.GetSiblingIndex()] = Mathf.InverseLerp(GetComponentInParent<InstrumentColorAverage>().bandIntensity[transform.GetSiblingIndex()], maxShaderPositionLerp, instrumentIntensityAveraged);
+
+
+
+        if (instrumentIntensityAveraged >= eventFreqTrigger && canTriggerEvents == true)
+        {
+            TriggerInstrumentEvent();
+        }
+        else if (instrumentIntensityAveraged <= eventFreqTrigger - 1f)
+        {
+            canTriggerEvents = true;
+        }
+    }
+
+    public void TriggerInstrumentEvent()
+    {
+        canTriggerEvents = false;
+
+        if (randomlyPickOneEvent == false)
+        {
+            for (int i = 0; InstrumentEvents.Count > i; i++)
+            {
+                InstrumentEvents[i].Invoke();
+            }
+        }
+        else
+        {
+            if (InstrumentEvents.Count != 0)
+            InstrumentEvents[Random.Range(0, InstrumentEvents.Count)].Invoke();
+        }
     }
 }

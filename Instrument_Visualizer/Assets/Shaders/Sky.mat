@@ -91,7 +91,7 @@ Material:
     - _DstBlend: 0
     - _Emission1: 1
     - _Emission2: 1
-    - _Frequency: 30.21224
+    - _Frequency: 0.103761815
     - _FrequencyA: 18.258999
     - _FrequencyB: 0
     - _GlossMapScale: 1
@@ -102,11 +102,11 @@ Material:
     - _NoInputBlend: 0
     - _NumberOfInstruments: 2.51
     - _OcclusionStrength: 1
-    - _OverallDim: 5
+    - _OverallDim: 30
     - _Parallax: 0.02
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
-    - _Speed: 0.7321933
+    - _Speed: 0.0060775843
     - _SpeedA: 10
     - _SpeedB: 0
     - _SrcBlend: 1
@@ -114,9 +114,9 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 0, b: 0, a: 1}
-    - _ColorAverage: {r: 1.3347006, g: 0.5522436, b: 0.6317987, a: 1.6659888}
+    - _ColorAverage: {r: -1.8486981, g: -1.8546267, b: -1.8490968, a: -1.355334}
     - _ColorTest: {r: 5.688775, g: 2.6006193, b: 2.8875754, a: 5.659284}
-    - _Dir: {r: -0.35827854, g: -0.24432065, b: 0, a: 0}
+    - _Dir: {r: -0.005377466, g: 0.292958, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _FromColor: {r: 1, g: 0, b: 0, a: 1}
     - _NoInputColor: {r: 0, g: 0, b: 0, a: 0}
