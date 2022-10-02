@@ -8,9 +8,8 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Sky
-  m_Shader: {fileID: 106, guid: 0000000000000000f000000000000000, type: 0}
-  m_ValidKeywords:
-  - _SUNDISK_HIGH_QUALITY
+  m_Shader: {fileID: 4800000, guid: 8a1e75f1263833c4db1c7962dbab5b0b, type: 3}
+  m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -83,30 +82,45 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AtmosphereThickness: 0.63
+    - _Blend: 0
     - _BumpScale: 1
+    - _ColorBlend: 0
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
+    - _Dir: 1
     - _DstBlend: 0
-    - _Exposure: 8
+    - _Emission1: 1
+    - _Emission2: 1
+    - _Frequency: 8.859625
+    - _FrequencyA: 18.258999
+    - _FrequencyB: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 0
+    - _NoInputBlend: 0
+    - _NumberOfInstruments: 2.51
     - _OcclusionStrength: 1
+    - _OverallDim: 30
     - _Parallax: 0.02
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
+    - _Speed: 0.8749857
+    - _SpeedA: 10
+    - _SpeedB: 0
     - _SrcBlend: 1
-    - _SunDisk: 2
-    - _SunSize: 0
-    - _SunSizeConvergence: 5
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 1, g: 0, b: 0, a: 1}
+    - _ColorAverage: {r: 2.7525961, g: 2.1916752, b: 2.3762257, a: 3.5600893}
+    - _ColorTest: {r: 5.688775, g: 2.6006193, b: 2.8875754, a: 5.659284}
+    - _Dir: {r: 0.017416202, g: 1.4e-43, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _GroundColor: {r: 0, g: 0, b: 0, a: 1}
-    - _SkyTint: {r: 0, g: 0, b: 0, a: 1}
+    - _FromColor: {r: 1, g: 0, b: 0, a: 1}
+    - _NoInputColor: {r: 0, g: 0, b: 0, a: 0}
+    - _TargetDir: {r: -0.21, g: -0.125, b: 0, a: 0}
+    - _Test: {r: 0, g: 0, b: 0, a: 0}
+    - _ToColor: {r: 0, g: 0.07450986, b: 1, a: 1}
   m_BuildTextureStacks: []

@@ -6,8 +6,12 @@ public class VoiceDetection : MonoBehaviour
 {
 	//https://github.com/patrickhimes/microphone-demo/tree/4f80a624b34316d002cb5d7ddaa576164021f5d0
 
+	//most of this code is just the same as the link above, but I just adjusted one or two things to make it easier to use in editor
+
+	[Tooltip("The audio device which this obj will be using")]
 	public string microphone;
 	private AudioSource audioSource;
+	[Tooltip("The list of available audio devices")]
 	public List<string> options = new List<string>();
 	public int audioSampleRate = 44100;
 
@@ -23,17 +27,19 @@ public class VoiceDetection : MonoBehaviour
     {
 		options.Clear();
 
-		//get components you'll need
+		//get the source from the object
 		audioSource = GetComponent<AudioSource>();
 
-		// get all available microphones
+		// get all available microphones connected in the computer
 		foreach (string device in Microphone.devices)
 		{
+			//stops the process in case no mic is plugged
 			if (microphone == null)
 			{
 				//set default mic to first mic found.
 				microphone = device;
 			}
+			//adds all devices into a list
 			options.Add(device);
 
 			Debug.Log(device);

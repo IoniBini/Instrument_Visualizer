@@ -1,11 +1,20 @@
 ﻿Shader "Custom/BasicFragment"
 {
+    //this shader was written by copying the sin wave pattern that lachlan showed me in class, the rest
+    //of it however, is my work, after researching how shaders work
+    //(this is my first time writing a shader sooooo it might not be the preettiest)
+
     Properties
     {
+        //the average color of all the instruments togeteher
         _ColorAverage("Color Average", Color) = (1, 0, 0, 0)
+        //darkens the shader by this amount, because it tends to be too bright
         _OverallDim("Overall Shader Dim", float) = 10
+        //the direction at which the center of the sin waves is
         _Dir("Direction", Vector) = (0.0, 1.0, 0.0)
+        //the frequency of the sin waves
         _Frequency ("Frequency", Float) = 5
+        //the speed of movement of the sin waves
         _Speed ("Speed", Float) = 1
     }
     SubShader
