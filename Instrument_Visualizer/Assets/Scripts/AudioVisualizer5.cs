@@ -12,6 +12,13 @@ public class AudioVisualizer5 : MonoBehaviour
     //Band = each individual child of the instrument
     //Microphone = an audio input device the computer is using
 
+    //BEFORE YOU BEGIN READING THIS CODE
+    //there is a known "glitch" in this system. If you change the order of bands within "band parameters",
+    //it will completely mess up the range capture system, making it so that the high and low frequencies BOTH get caught by the same band. This can be fixed
+    //by either returning the bands to their original order, or simply deleting all the bands from the list, and adding new ones in their place.
+    //I have NO idea why this happens but I guess it could be some "hangover information" 
+    //that for some reason permiates between swapping from play time to edit time. 
+
     //properties used in changing the colour of the property block
     [HideInInspector] public List<Color> currentColor;
     [HideInInspector] public Color colorAverage;
@@ -212,7 +219,7 @@ public class AudioVisualizer5 : MonoBehaviour
 
                         if (bandParameters[j].frequencyGate > spectrum[i])
                         {
-                            currentValue += spectrum[i] / 100;
+                            currentValue += spectrum[i] * 0.1f;
                             numberOfFrequencies++;
                         }
                         else

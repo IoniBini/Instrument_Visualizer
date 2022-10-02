@@ -1,2 +1,2 @@
-# Visual_Audiolizer
-A tool that allows you to draw something, and the software will interpret it in audio form
+# Instrument_Visualizer
+A tool that allows you to connect instruments into unity, and have them translated into visuals in real time
