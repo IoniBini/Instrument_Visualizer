@@ -13,7 +13,7 @@ public class VoiceDetection : MonoBehaviour
 	private AudioSource audioSource;
 	[Tooltip("The list of available audio devices")]
 	public List<string> options = new List<string>();
-	public int audioSampleRate = 44100;
+	private int audioSampleRate = 44100;
 
 	void Start()
     {

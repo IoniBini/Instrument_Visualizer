@@ -13,11 +13,12 @@ public class AudioVisualizer5 : MonoBehaviour
     //Microphone = an audio input device the computer is using
 
     //BEFORE YOU BEGIN READING THIS CODE
-    //there is a known "glitch" in this system. If you change the order of bands within "band parameters",
-    //it will completely mess up the range capture system, making it so that the high and low frequencies BOTH get caught by the same band. This can be fixed
-    //by either returning the bands to their original order, or simply deleting all the bands from the list, and adding new ones in their place.
-    //I have NO idea why this happens but I guess it could be some "hangover information" 
-    //that for some reason permiates between swapping from play time to edit time. 
+    //there is a known glitch in this system, but that is very easy to work around.
+    //The issue is with the band ranges in the band parameters. 
+    //The ranges will only work correctly if you put them in a decreasing order. 
+    //For example, if you want a band to capture only high frequencies, between 880 and 883, and you also want to capture low frequencies, between 0 and 10
+    //then you NEED to put the one capturing high frequencies first in the list, and the low one after
+    //Not sure why this happens, but it will work just fine otehrwise
 
     //properties used in changing the colour of the property block
     [HideInInspector] public List<Color> currentColor;
@@ -93,12 +94,16 @@ public class AudioVisualizer5 : MonoBehaviour
     [System.Serializable]
     public struct BandParameters
     {
-        [Tooltip("Captures a range of frequencies present between the values in each vector2, then averages them all into one band")]
+        [Tooltip("Captures a range of frequencies present between the values in each vector2, then averages them all into one band. " +
+            "I heavily recommend using the 'FullSpectrum' obj prefab in order to better be able to see where each frequency lies, " +
+            "because it contans EVERY SINGLE frequency together in a line, with their numbers as well")]
         public List<Vector2> bandRange;
         [Tooltip("This filters off dead frequencies that can't be heard but can still be seen by the band. A low value filters lower frequencies, a high value filters higher frequencies")]
         [Min(0f)] public float frequencyGate;
-        [Tooltip("Makes the band scaling more intense")]
-        [Min(0.1f)] public float heightMultiplier;
+        [Tooltip("Makes the intensity of each collected frequency higher. It helps in making higher frequencies more powerful")]
+        [Min(0.1f)] public float intensityMultiplier;
+        [Tooltip("Makes the band scaling more intense in scale")]
+        [Min(1f)] public float heightMultiplier;
         [Tooltip("The speed at which each band grows and shrinks. Smaller values move slower, higher values move faster")]
         [Range(0.01f, 0.5f)] public float lerpTime;
         [Tooltip("The color of the band throughout its frequency intensity")]
@@ -195,7 +200,9 @@ public class AudioVisualizer5 : MonoBehaviour
 
         //setting up blank variables to be used inside the many for loops below
         float instrumentIntensity = 0;
+        float instrumentHeight = 0;
         float currentValue = 0;
+        float currentHeight = 0;
         int numberOfFrequencies = 0;
         int currentColorCount = 0;
 
@@ -220,6 +227,7 @@ public class AudioVisualizer5 : MonoBehaviour
                         if (bandParameters[j].frequencyGate > spectrum[i])
                         {
                             currentValue += spectrum[i] * 0.1f;
+                            currentHeight += bandParameters[j].heightMultiplier * 0.1f;
                             numberOfFrequencies++;
                         }
                         else
@@ -228,6 +236,7 @@ public class AudioVisualizer5 : MonoBehaviour
                             //up once for each time that a frequency is added to the currentValue
 
                             currentValue += spectrum[i];
+                            currentHeight += bandParameters[j].heightMultiplier;
                             numberOfFrequencies++;
                         }
                     }
@@ -236,11 +245,13 @@ public class AudioVisualizer5 : MonoBehaviour
             }
 
             //the currentValue is dividied by the number of frequencies that were collected in total, giving us the average that the band can use
-            float average = (currentValue / numberOfFrequencies) * bandParameters[j].heightMultiplier;
+            float average = (currentValue / numberOfFrequencies) * bandParameters[j].intensityMultiplier;
+            float heightAverage = (currentHeight / numberOfFrequencies);
 
             //the same averaging techinque described above is then done for each band, because its result will then give us the overall intensity of the instrument
             //which takes into account every band summed together
             instrumentIntensity += average;
+            instrumentHeight += heightAverage;
 
             //using the newly found average of the band, a lerp will then smooth out the growth and decay of the value so that it can be fed to the shader's prperties,
             //which are all controlled by the parent of this object
@@ -248,7 +259,7 @@ public class AudioVisualizer5 : MonoBehaviour
             shaderSpeedLerp = Mathf.Lerp(GetComponentInParent<InstrumentParent>().skyShader.GetFloat("_Speed"), average * shaderSpeedMultiplier, bandParameters[j].lerpTime);
 
             //the same techinque of smoothing the average is used in the scaling of each individual band
-            float lerpY = Mathf.Lerp(transform.GetChild(j).localScale.y, average, bandParameters[j].lerpTime);
+            float lerpY = Mathf.Lerp(transform.GetChild(j).localScale.y, average * bandParameters[j].heightMultiplier, bandParameters[j].lerpTime);
             transform.GetChild(j).localScale = new Vector3(transform.GetChild(j).localScale.x, lerpY, transform.localScale.z);
 
             //in order to safely change the colours of each band without causing many shader issues, we set up a property block for the current material
@@ -277,7 +288,9 @@ public class AudioVisualizer5 : MonoBehaviour
 
         //as mentioned before, the overall intensity that this instrument outputs is then divided by the number of bands, and this value is sent to the parent
         float instrumentIntensityAveraged = instrumentIntensity / currentColorCount;
-        GetComponentInParent<InstrumentParent>().instrumentIntensity[transform.GetSiblingIndex()] = Mathf.InverseLerp(GetComponentInParent<InstrumentParent>().instrumentIntensity[transform.GetSiblingIndex()], maxShaderPositionLerp, instrumentIntensityAveraged);
+        float instrumentHeightAveraged = instrumentHeight / currentColorCount;
+        float totalAverage = (instrumentIntensityAveraged + instrumentHeightAveraged) / 2;
+        GetComponentInParent<InstrumentParent>().instrumentIntensity[transform.GetSiblingIndex()] = Mathf.InverseLerp(GetComponentInParent<InstrumentParent>().instrumentIntensity[transform.GetSiblingIndex()], maxShaderPositionLerp, totalAverage);
 
         //checks to see if the current total intensity of this instrument is sufficient to trigger this instrument's events, and ensures this only happens once, until it resets
         if (instrumentIntensityAveraged >= eventFreqTrigger && canTriggerEvents == true)

@@ -5,26 +5,29 @@ using System.Collections.Generic;
 
 public class AudioVisualizerDebug : MonoBehaviour
 {
+	//https://www.youtube.com/watch?v=Ri1uNPNlaVs&t=652s
+	//this script is lightly inspired by this guy's code
+
+	[Tooltip("The audio source where this obj is getting its spectrum from (leave empty in case you want to just capture audio from this object itself)")]
 	public AudioSource targetAudio;
+	[Tooltip("Each individual frequency from the numberOfSamples has a corresponding obj")]
 	public List<Transform> audioSpectrumObjects = new List<Transform>();
+	[Tooltip("How high the frequencies grow in size")]
 	[Min(1)] public float heightMultiplier;
 	[Range(6, 13)] [Tooltip("This number is powered by 2, resulting in a multiple that fits between 64 and 8192")]
 	public int numberOfSamples = 6;
 
 	private int convertedSamples;
+	[Tooltip("The amount of space that this object occupies in width")]
 	public float visualizerSpan = 21f;
+	[Tooltip("The speed at which each individual frequency grows and decays")]
 	[Range(0.01f, 0.5f)]public float lerpTime = 0.01f;
+	[Tooltip("The objects that are spawned for each frequency")]
 	public GameObject visualizerObj;
-
-	/*
-	 * The intensity of the frequencies found between 0 and 44100 will be
-	 * grouped into 1024 elements. So each element will contain a range of about 43.06 Hz.
-	 * The average human voice spans from about 60 hz to 9k Hz
-	 * we need a way to assign a range to each object that gets animated. that would be the best way to control and modify animatoins.
-	*/
 
 	private void Start()
     {
+		//if no target is set, it uses the object's own source, otherwise, it uses the target
 		if (targetAudio == null)
         {
 			targetAudio = GetComponent<AudioSource>();
@@ -35,28 +38,36 @@ public class AudioVisualizerDebug : MonoBehaviour
 			GetComponent<VoiceDetection>().enabled = false;
 		}
 
+		//clears the previous objects so the list doesn't compound with each iteration
 		audioSpectrumObjects.Clear();
+		//then generates a fresh batch of new objects
 		GenerateVisualizerObjs();
     }
 
 	[ContextMenu("Generate Visualizer Objs")]
 	public void GenerateVisualizerObjs()
     {
+		//this function multiplies 2 by 2 a number of times which will result in, of course, a multiple of 2, which we can use to capture frequencies
 		convertedSamples = Mathf.FloorToInt(Mathf.Pow(2f, Mathf.RoundToInt(numberOfSamples)));
 
+		//clears the previous frequencies so the list doesn't compound with each iteration
 		ClearVisualizer();
 
+		//the scale of each obj is equals to the width the visualizer should have divided by the number of objs being spawned
 		float samplesScales = visualizerSpan / convertedSamples;
 
+		//loops for each frequency
 		for (int i = 0; i < convertedSamples; i++)
-		//for (int i = 0; i < 170; i++)
 		{
-			//Debug.Log("ACTUAL override: " + overrideValue);
-			//Debug.Log(i);
+			//creates an obj for each frequency
 			var instantiatedObj = Instantiate(visualizerObj, new Vector3((samplesScales * i) - (visualizerSpan/2) + transform.position.x, transform.position.y, transform.position.z), new Quaternion(0,0,0,0));
+			//sets the scale of the obj that was created
 			instantiatedObj.transform.localScale = new Vector3(samplesScales, 1, 1);
+			//makes the new obj a child of this obj
 			instantiatedObj.transform.parent = transform;
-			instantiatedObj.name = "Frequency " + i;
+			//renames the child obj to its corresponding frequency
+			instantiatedObj.name = "Frequency " + (i + 1);
+			//adds the obj in question to the list of objs
 			audioSpectrumObjects.Add(instantiatedObj.transform);
 		}
 	}
@@ -67,6 +78,7 @@ public class AudioVisualizerDebug : MonoBehaviour
 		GameObject currentObj;
 		int childs = transform.childCount;
 
+		//goes through each obj and deletes it
 		for (int i = childs - 1; i >= 0; i--)
 		{
 			currentObj = transform.GetChild(i).gameObject;
@@ -81,6 +93,7 @@ public class AudioVisualizerDebug : MonoBehaviour
             }
 		}
 
+		//clears the list of objs
 		audioSpectrumObjects.Clear();
 	}
 
@@ -94,13 +107,8 @@ public class AudioVisualizerDebug : MonoBehaviour
 
 		for (int j = 0; j < convertedSamples; j++)
 		{
+			//sets the frequency of each individual child to each individual corresponding obj
 			float intensity = spectrum[j] * heightMultiplier;
-
-			//this one below doesn't work for some reason... the idea is for it to average the spectrum data by dividing it into the number of cubes that have been created
-			//that way you can manually set how many cubes you want to use instead of just hte exact amount of frequencies captured
-
-			//float intensity = correctedSpectrum[j];
-			//Debug.Log("type 1 = " + spectrum[i] * heightMultiplier + " type 2 = " + frequencyRange * heightMultiplier);
 
 			// calculate object's scale
 			float lerpY = Mathf.Lerp(audioSpectrumObjects[j].localScale.y, intensity, lerpTime);
@@ -108,7 +116,6 @@ public class AudioVisualizerDebug : MonoBehaviour
 
 			// appply new scale to object
 			audioSpectrumObjects[j].localScale = newScale;
-
 		}
 	}
 }
