@@ -2,6 +2,8 @@
 
 Ionatan Biniamin Maghidman
 
+Git Repo: https://github.com/IoniBini/Instrument_Visualizer
+
 ------------------------------------------------
 
 Description:
@@ -20,6 +22,10 @@ Equipment needed to connect an instrument to this application:
 
 How to use:
 
+PLEASE NOTE THAT THE ONLY REASON I AM NOT SUBMITTING A BUILT VERSION AT FIRST is because this application works best when you build it yourself...
+I will soon send an updated assignment file which contains a build that should work for general purposes, but as I already have explained to Lachlan in class, it is best if you follow the steps below and
+then just make a build for yourself...
+
 I have created a sample scene called "SampleScene" which is already totally set up and ready for use. If you want to use this set up, here are the steps to using the application:
 
 1. Make sure the number of children inside the "InstrumentParent" is equivalent to the EXACT number of instruments you wish to capture
@@ -28,6 +34,9 @@ I have created a sample scene called "SampleScene" which is already totally set 
 4. Simply copy the device name you wish to use and paste it in the field called "Microphone"
 5. It is all set up, and you are now able to change the settings of the "InstrumentVisualizer5" to fine tune the capturing and visuals of your instrument (all the variables have tool tips that explain what each thing does)
 6. Press play and watch the magic!
+
+Once this is all set up correctly, you may build the current scene under File>BuildSettings, then "AddOpenScenes", and you can build to whatever location you wish. This build will now work for your
+currently set up chosen device.
 
 In case you do NOT want to use the sample scene, and want to set it all up yourself, here are the steps to creating a scene that will work:
 
@@ -63,6 +72,6 @@ https://www.ronja-tutorials.com/post/047-invlerp_remap/
 
 Extra comments:
 
-This repo has a sample build as well as a video attached which displays what this tool is capable of achieving.
-To get the most out of this tool, I HEAVILY recommend that you do not simply use the sample build, because it is not catered for the particular details of the instrument YOU might choose to connect.
-Instead, I recommend that you download the project, connect your instrument in, and play around with the parameters so that it suits your instrument the best, and ONLY THEN make a build yourself.
+This repo has a sample scene as well as a video attached which displays what this tool is capable of achieving.
+To get the most out of this tool, I HEAVILY recommend that you do not simply use the sample scene within the editor, because it is not catered for the particular details of the instrument YOU might choose to connect.
+Instead, I recommend that you download the project, connect your instrument in, and play around with the parameters so that it suits your instrument the best, and ONLY THEN make a build yourself, and use THAT as your visualizer.
